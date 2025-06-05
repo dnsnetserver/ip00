@@ -196,5 +196,61 @@
     <a href="#">Terms & Conditions</a>
   </div>
   </div>
+  <!-- JavaScript -->
+  <script>
+    const form = document.getElementById("credit-form");
+    const feedback = document.getElementById("form-feedback");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Get values
+      const paymentHistory = document.getElementById("payment-history").value;
+      const creditLength = document.getElementById("credit-length").value;
+      const carryBalance = document.getElementById("carry-balance").value;
+      const creditUsage = document.getElementById("credit-usage").value;
+      const recentCredit = document.getElementById("recent-credit").value;
+      const email = document.getElementById("email").value;
+
+      const creditTypes = Array.from(document.querySelectorAll('input[name="credit-type"]:checked'))
+        .map(input => input.value);
+
+      // Validation
+      if (!paymentHistory || !creditLength || !carryBalance || !creditUsage || !recentCredit || !email || creditTypes.length === 0) {
+        feedback.textContent = "Please fill out all fields and select at least one credit type.";
+        feedback.className = "error-message";
+        return;
+      }
+
+      // Submit
+      try {
+        const response = await fetch("/submit-form", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            paymentHistory,
+            creditLength,
+            carryBalance,
+            creditUsage,
+            creditTypes,
+            recentCredit,
+            email
+          })
+        });
+
+        if (response.ok) {
+          feedback.textContent = "Form submitted successfully. Check your email!";
+          feedback.className = "success-message";
+          form.reset();
+        } else {
+          feedback.textContent = "Something went wrong. Try again.";
+          feedback.className = "error-message";
+        }
+      } catch (error) {
+        feedback.textContent = "Network error. Please try again later.";
+        feedback.className = "error-message";
+      }
+    });
+  </script>
 </body>
 </html>
